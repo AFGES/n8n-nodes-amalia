@@ -1,10 +1,106 @@
 import type {
 	IDataObject,
 	IExecuteSingleFunctions,
+	IHttpRequestOptions,
 	INodeExecutionData,
 	INodeProperties,
 } from 'n8n-workflow';
-import { listOutput, listProperties } from '../shared/listParams';
+import { appendQs, listOutput, listProperties } from '../shared/listParams';
+
+/** Selectable association states for the `etats` filter. */
+const ETAT_OPTIONS = [
+	{ name: 'Inscrite', value: 'INSCRITE' },
+	{ name: 'Dissoute', value: 'DISSOUTE' },
+	{ name: 'Radiée', value: 'RADIEE' },
+	{ name: 'Non Conforme', value: 'NONCONFORME' },
+];
+
+/** Filter fields whose value is sent as a number. */
+const NUMERIC_FILTER_FIELDS = ['volume', 'folio', 'tribunal'];
+
+/** Filter fields whose value is sent as a plain string. */
+const STRING_FILTER_FIELDS = ['numero', 'nom', 'commune', 'codePostal', 'adresse'];
+
+/**
+ * Fetches the tribunal IDs the authenticated user has access to from
+ * `/constantes` (the same source the web client seeds its search from).
+ */
+async function fetchTribunalIds(this: IExecuteSingleFunctions): Promise<number[]> {
+	const credentials = await this.getCredentials('amaliaApi');
+	const baseUrl = String(credentials.baseUrl).replace(/\/+$/, '');
+	const constantes = (await this.helpers.httpRequestWithAuthentication.call(this, 'amaliaApi', {
+		method: 'GET',
+		url: `${baseUrl}/api/constantes`,
+		json: true,
+	})) as { tribunaux?: Array<{ id: number }> };
+	return (constantes.tribunaux ?? []).map((t) => t.id);
+}
+
+/**
+ * Translates the Filters conditions into AMALIA search query params.
+ * The endpoint only does equality (no operators) and AND-only matching, so each
+ * condition becomes `field=value`. `etats` is multi-valued: every selected state
+ * is appended as a repeated key (e.g. `etats=INSCRITE&etats=DISSOUTE`).
+ *
+ * The backend treats `etats` and `tribunal` as mandatory IN-lists — omitting
+ * them returns zero rows. So when the user leaves them unset we default to
+ * "all", mirroring the web client (App.vue seeds all états + all tribunaux).
+ */
+async function attachAssociationFilters(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const { condition = [] } = this.getNodeParameter('filters', {}) as {
+		condition?: Array<{
+			field: string;
+			valueString?: string;
+			valueNumber?: number;
+			valueEtats?: string[];
+			valueMes?: boolean;
+		}>;
+	};
+
+	const qs = (requestOptions.qs ?? {}) as IDataObject;
+	for (const c of condition) {
+		if (!c.field) {
+			continue;
+		}
+		if (c.field === 'etats') {
+			for (const etat of c.valueEtats ?? []) {
+				appendQs(qs, 'etats', etat);
+			}
+			continue;
+		}
+
+		const value =
+			c.field === 'mes'
+				? c.valueMes
+				: NUMERIC_FILTER_FIELDS.includes(c.field)
+					? c.valueNumber
+					: c.valueString;
+
+		if (value === undefined || value === '') {
+			continue;
+		}
+		appendQs(qs, c.field, value);
+	}
+
+	// Default the mandatory IN-list filters to "all" when the user left them
+	// unset, otherwise the backend returns zero rows.
+	if (qs.etats === undefined) {
+		for (const { value } of ETAT_OPTIONS) {
+			appendQs(qs, 'etats', value);
+		}
+	}
+	if (qs.tribunal === undefined) {
+		for (const id of await fetchTribunalIds.call(this)) {
+			appendQs(qs, 'tribunal', id);
+		}
+	}
+
+	requestOptions.qs = qs;
+	return requestOptions;
+}
 
 const showOnlyForAssociations = {
 	resource: ['association'],
@@ -55,7 +151,10 @@ export const associationDescription: INodeProperties[] = [
 				action: 'Get many associations',
 				description: 'List associations',
 				routing: {
-					request: { method: 'GET', url: '/association' },
+					// `page` is sent explicitly: the SpringData list endpoint returns an
+					// empty page when only `size` is present (the web client always sends
+					// both). When Return All is on, the pagination block overrides `page`.
+					request: { method: 'GET', url: '/association', qs: { page: 0 } },
 					...listOutput,
 				},
 			},
@@ -93,5 +192,72 @@ export const associationDescription: INodeProperties[] = [
 		description:
 			'Whether to keep the full version history (newest-first) under a "version" field, instead of merging only the newest version into the association record',
 	},
-	...listProperties('association'),
+	{
+		displayName: 'Filters',
+		name: 'filters',
+		type: 'fixedCollection',
+		placeholder: 'Add Condition',
+		typeOptions: { multipleValues: true },
+		displayOptions: { show: { ...showOnlyForAssociations, operation: ['getAll'] } },
+		default: {},
+		description: 'Search criteria sent to the AMALIA association list endpoint',
+		options: [
+			{
+				name: 'condition',
+				displayName: 'Condition',
+				values: [
+					{
+						displayName: 'Field',
+						name: 'field',
+						type: 'options',
+						default: 'nom',
+						description: 'Association field to filter on',
+						options: [
+							{ name: 'Address', value: 'adresse' },
+							{ name: 'Commune', value: 'commune' },
+							{ name: 'Folio', value: 'folio' },
+							{ name: 'Mine Only', value: 'mes' },
+							{ name: 'Name', value: 'nom' },
+							{ name: 'Number', value: 'numero' },
+							{ name: 'Postal Code', value: 'codePostal' },
+							{ name: 'States', value: 'etats' },
+							{ name: 'Tribunal ID', value: 'tribunal' },
+							{ name: 'Volume', value: 'volume' },
+						],
+					},
+					{
+						displayName: 'Mine Only',
+						name: 'valueMes',
+						type: 'boolean',
+						default: false,
+						displayOptions: { show: { field: ['mes'] } },
+					},
+					{
+						displayName: 'States',
+						name: 'valueEtats',
+						type: 'multiOptions',
+						default: [],
+						options: ETAT_OPTIONS,
+						displayOptions: { show: { field: ['etats'] } },
+					},
+					{
+						displayName: 'Value',
+						name: 'valueString',
+						type: 'string',
+						default: '',
+						displayOptions: { show: { field: STRING_FILTER_FIELDS } },
+					},
+					{
+						displayName: 'Value',
+						name: 'valueNumber',
+						type: 'number',
+						default: 0,
+						displayOptions: { show: { field: NUMERIC_FILTER_FIELDS } },
+					},
+				],
+			},
+		],
+		routing: { send: { preSend: [attachAssociationFilters] } },
+	},
+	...listProperties('association', { genericFilters: false }),
 ];

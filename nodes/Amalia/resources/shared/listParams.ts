@@ -6,6 +6,21 @@ import type {
 } from 'n8n-workflow';
 
 /**
+ * Appends a query-string parameter, promoting to an array when the key already
+ * exists so AMALIA receives repeated keys (e.g. `etats=A&etats=B`).
+ */
+export function appendQs(qs: IDataObject, key: string, value: unknown): void {
+	const existing = qs[key];
+	if (existing === undefined) {
+		qs[key] = value as IDataObject[string];
+	} else if (Array.isArray(existing)) {
+		(existing as unknown[]).push(value);
+	} else {
+		qs[key] = [existing, value] as IDataObject[string];
+	}
+}
+
+/**
  * Appends user-defined search filters to the request query string.
  * AMALIA list endpoints accept an arbitrary `search` object; each filter
  * becomes a query parameter (repeated keys are supported for arrays).
@@ -28,14 +43,7 @@ async function attachFilters(
 		if (!name) {
 			continue;
 		}
-		const existing = qs[name];
-		if (existing === undefined) {
-			qs[name] = value;
-		} else if (Array.isArray(existing)) {
-			(existing as string[]).push(value);
-		} else {
-			qs[name] = [existing as string, value];
-		}
+		appendQs(qs, name, value);
 	}
 	requestOptions.qs = qs;
 	return requestOptions;
@@ -45,11 +53,17 @@ async function attachFilters(
  * Shared properties for a SpringData-backed "Get Many" operation.
  * Handles Return All (page-based pagination), Limit (`size`), Sort and Filters.
  * Pass the resource name so `displayOptions` only shows them for that resource.
+ * Set `genericFilters: false` to omit the generic Name/Value Filters collection
+ * (e.g. when a resource supplies its own typed/visual filter UI).
  */
-export function listProperties(resource: string): INodeProperties[] {
+export function listProperties(
+	resource: string,
+	opts: { genericFilters?: boolean } = {},
+): INodeProperties[] {
+	const { genericFilters = true } = opts;
 	const show = { operation: ['getAll'], resource: [resource] };
 
-	return [
+	const properties: INodeProperties[] = [
 		{
 			displayName: 'Return All',
 			name: 'returnAll',
@@ -105,7 +119,10 @@ export function listProperties(resource: string): INodeProperties[] {
 				},
 			},
 		},
-		{
+	];
+
+	if (genericFilters) {
+		properties.push({
 			displayName: 'Filters',
 			name: 'filters',
 			type: 'fixedCollection',
@@ -139,8 +156,10 @@ export function listProperties(resource: string): INodeProperties[] {
 			routing: {
 				send: { preSend: [attachFilters] },
 			},
-		},
-	];
+		});
+	}
+
+	return properties;
 }
 
 /** Output extractor: AMALIA list responses wrap rows in an `items` array. */
