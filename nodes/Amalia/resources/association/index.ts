@@ -6,6 +6,7 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 import { appendQs, listOutput, listProperties } from '../shared/listParams';
+import { fetchTribunaux } from '../shared/tribunaux';
 
 /** Selectable association states for the `etats` filter. */
 const ETAT_OPTIONS = [
@@ -16,25 +17,10 @@ const ETAT_OPTIONS = [
 ];
 
 /** Filter fields whose value is sent as a number. */
-const NUMERIC_FILTER_FIELDS = ['volume', 'folio', 'tribunal'];
+const NUMERIC_FILTER_FIELDS = ['volume', 'folio'];
 
 /** Filter fields whose value is sent as a plain string. */
 const STRING_FILTER_FIELDS = ['numero', 'nom', 'commune', 'codePostal', 'adresse'];
-
-/**
- * Fetches the tribunal IDs the authenticated user has access to from
- * `/constantes` (the same source the web client seeds its search from).
- */
-async function fetchTribunalIds(this: IExecuteSingleFunctions): Promise<number[]> {
-	const credentials = await this.getCredentials('amaliaApi');
-	const baseUrl = String(credentials.baseUrl).replace(/\/+$/, '');
-	const constantes = (await this.helpers.httpRequestWithAuthentication.call(this, 'amaliaApi', {
-		method: 'GET',
-		url: `${baseUrl}/api/constantes`,
-		json: true,
-	})) as { tribunaux?: Array<{ id: number }> };
-	return (constantes.tribunaux ?? []).map((t) => t.id);
-}
 
 /**
  * Translates the Filters conditions into AMALIA search query params.
@@ -56,6 +42,7 @@ async function attachAssociationFilters(
 			valueString?: string;
 			valueNumber?: number;
 			valueEtats?: string[];
+			valueTribunal?: number[];
 			valueMes?: boolean;
 		}>;
 	};
@@ -68,6 +55,12 @@ async function attachAssociationFilters(
 		if (c.field === 'etats') {
 			for (const etat of c.valueEtats ?? []) {
 				appendQs(qs, 'etats', etat);
+			}
+			continue;
+		}
+		if (c.field === 'tribunal') {
+			for (const id of c.valueTribunal ?? []) {
+				appendQs(qs, 'tribunal', id);
 			}
 			continue;
 		}
@@ -93,7 +86,7 @@ async function attachAssociationFilters(
 		}
 	}
 	if (qs.tribunal === undefined) {
-		for (const id of await fetchTribunalIds.call(this)) {
+		for (const { id } of await fetchTribunaux.call(this)) {
 			appendQs(qs, 'tribunal', id);
 		}
 	}
@@ -221,7 +214,7 @@ export const associationDescription: INodeProperties[] = [
 							{ name: 'Number', value: 'numero' },
 							{ name: 'Postal Code', value: 'codePostal' },
 							{ name: 'States', value: 'etats' },
-							{ name: 'Tribunal ID', value: 'tribunal' },
+							{ name: 'Tribunal', value: 'tribunal' },
 							{ name: 'Volume', value: 'volume' },
 						],
 					},
@@ -239,6 +232,16 @@ export const associationDescription: INodeProperties[] = [
 						default: [],
 						options: ETAT_OPTIONS,
 						displayOptions: { show: { field: ['etats'] } },
+					},
+					{
+						displayName: 'Tribunal Names or IDs',
+						name: 'valueTribunal',
+						type: 'multiOptions',
+						default: [],
+						description:
+							'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+						typeOptions: { loadOptionsMethod: 'getTribunaux' },
+						displayOptions: { show: { field: ['tribunal'] } },
 					},
 					{
 						displayName: 'Value',

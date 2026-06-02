@@ -1,9 +1,16 @@
-import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
+import {
+	NodeConnectionTypes,
+	type ILoadOptionsFunctions,
+	type INodePropertyOptions,
+	type INodeType,
+	type INodeTypeDescription,
+} from 'n8n-workflow';
 import { associationDescription } from './resources/association';
 import { requeteDescription } from './resources/requete';
 import { pieceDescription } from './resources/piece';
 import { lookupDescription } from './resources/lookup';
 import { systemDescription } from './resources/system';
+import { fetchTribunaux } from './resources/shared/tribunaux';
 
 export class Amalia implements INodeType {
 	description: INodeTypeDescription = {
@@ -64,5 +71,17 @@ export class Amalia implements INodeType {
 			...lookupDescription,
 			...systemDescription,
 		],
+	};
+
+	methods = {
+		loadOptions: {
+			// Populates the Tribunal filter dropdown with labels from /constantes.
+			async getTribunaux(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const tribunaux = await fetchTribunaux.call(this);
+				return tribunaux
+					.map((t) => ({ name: t.libelle, value: t.id }))
+					.sort((a, b) => a.name.localeCompare(b.name));
+			},
+		},
 	};
 }
