@@ -151,9 +151,13 @@ export class AmaliaApi implements ICredentialType {
 
 		const sessionCookie = extractCookie(loginResponse.headers['set-cookie'], SESSION_COOKIE);
 		if (!sessionCookie) {
-			throw new Error(
-				`Login failed: no ${SESSION_COOKIE} session cookie returned by /oauthlogin. Check username/password.`,
-			);
+			throw new Error(`Login failed: no ${SESSION_COOKIE} session cookie returned by /oauthlogin.`);
+		}
+		// The session cookie is set even on a failed login — the redirect target is what
+		// distinguishes success from failure (/oauthlogin sends ?error back to /login).
+		const loginLocation = (loginResponse.headers.location as string | undefined) ?? '';
+		if (/[?&]error\b/.test(loginLocation) || /\/login(\?|$)/.test(loginLocation)) {
+			throw new Error('Login failed: invalid username or password.');
 		}
 		const cookieHeader = `${SESSION_COOKIE}=${sessionCookie}`;
 
@@ -225,7 +229,11 @@ export class AmaliaApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: '=Bearer {{$credentials.accessToken}}',
+				// Only send a Bearer header when a token exists. preAuthentication mints the
+				// token at execution time, so during the save-time credential test accessToken
+				// is empty — emitting an empty header keeps the test endpoint happy (a tokenless
+				// "Bearer" string would 401).
+				Authorization: '={{$credentials.accessToken ? "Bearer " + $credentials.accessToken : ""}}',
 			},
 		},
 	};
