@@ -2,7 +2,7 @@ import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from '
 import { userDescription } from './resources/user';
 import { companyDescription } from './resources/company';
 
-export class AfgesAmalia implements INodeType {
+export class Amalia implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'AMALIA',
 		name: 'amalia',
