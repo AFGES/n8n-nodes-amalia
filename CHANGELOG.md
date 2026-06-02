@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+
+- **Association → Get**: add a `Show Version History` toggle (default off).
+  Always returns one item per association with the history newest-first.
+  - Off: merges only the newest version's `association` into the root and drops
+    the raw `associationRehydrateVisibles` array (and the per-version
+    `evenement`/`requete`/`extrait` fields).
+  - On: keeps the full body with `associationRehydrateVisibles` renamed to
+    `version` (newest-first).
+
 ## 0.2.0
 
 - Replace placeholder `Company`/`User` resources with the real AMALIA API.
