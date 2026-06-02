@@ -33,12 +33,12 @@ export class AfgesAmalia implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'User',
-						value: 'user',
-					},
-					{
 						name: 'Company',
 						value: 'company',
+					},
+					{
+						name: 'User',
+						value: 'user',
 					},
 				],
 				default: 'user',
