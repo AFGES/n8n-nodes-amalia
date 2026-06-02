@@ -8,8 +8,6 @@ import {
 import { associationDescription } from './resources/association';
 import { requeteDescription } from './resources/requete';
 import { pieceDescription } from './resources/piece';
-import { lookupDescription } from './resources/lookup';
-import { systemDescription } from './resources/system';
 import { fetchTribunaux } from './resources/shared/tribunaux';
 
 export class Amalia implements INodeType {
@@ -47,10 +45,6 @@ export class Amalia implements INodeType {
 						value: 'association',
 					},
 					{
-						name: 'Lookup',
-						value: 'lookup',
-					},
-					{
 						name: 'Piece',
 						value: 'piece',
 					},
@@ -58,18 +52,12 @@ export class Amalia implements INodeType {
 						name: 'Request',
 						value: 'requete',
 					},
-					{
-						name: 'System',
-						value: 'system',
-					},
 				],
 				default: 'association',
 			},
 			...associationDescription,
 			...requeteDescription,
 			...pieceDescription,
-			...lookupDescription,
-			...systemDescription,
 		],
 	};
 
