@@ -83,11 +83,15 @@ export class AmaliaApi implements ICredentialType {
 			description: 'Root URL of the registry instance',
 		},
 		// Holds the OAuth2 tokens obtained by preAuthentication. Not user-editable.
+		// `expirable: true` is what tells n8n to run preAuthentication — it calls it
+		// whenever this property is empty or a request 401s (token expired), then
+		// persists the refreshed tokens. Without it, preAuthentication never runs and
+		// every authenticated request goes out with an empty Bearer header (401).
 		{
 			displayName: 'Access Token',
 			name: 'accessToken',
 			type: 'hidden',
-			typeOptions: { password: true },
+			typeOptions: { password: true, expirable: true },
 			default: '',
 		},
 		{

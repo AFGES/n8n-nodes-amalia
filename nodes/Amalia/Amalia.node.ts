@@ -1,6 +1,9 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { userDescription } from './resources/user';
-import { companyDescription } from './resources/company';
+import { associationDescription } from './resources/association';
+import { requeteDescription } from './resources/requete';
+import { pieceDescription } from './resources/piece';
+import { lookupDescription } from './resources/lookup';
+import { systemDescription } from './resources/system';
 
 export class Amalia implements INodeType {
 	description: INodeTypeDescription = {
@@ -19,7 +22,7 @@ export class Amalia implements INodeType {
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'amaliaApi', required: true }],
 		requestDefaults: {
-			baseURL: 'https://associations.alsace-moselle.fr/api',
+			baseURL: '={{$credentials.baseUrl}}/api',
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -33,18 +36,33 @@ export class Amalia implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Company',
-						value: 'company',
+						name: 'Association',
+						value: 'association',
 					},
 					{
-						name: 'User',
-						value: 'user',
+						name: 'Lookup',
+						value: 'lookup',
+					},
+					{
+						name: 'Piece',
+						value: 'piece',
+					},
+					{
+						name: 'Request',
+						value: 'requete',
+					},
+					{
+						name: 'System',
+						value: 'system',
 					},
 				],
-				default: 'user',
+				default: 'association',
 			},
-			...userDescription,
-			...companyDescription,
+			...associationDescription,
+			...requeteDescription,
+			...pieceDescription,
+			...lookupDescription,
+			...systemDescription,
 		],
 	};
 }
