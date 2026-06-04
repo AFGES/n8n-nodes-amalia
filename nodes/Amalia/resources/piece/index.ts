@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { castDateFields } from '../shared/listParams';
 
 const showOnlyForPieces = {
 	resource: ['piece'],
@@ -22,6 +23,7 @@ export const pieceDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '=/pieces/{{$parameter.requeteNumber}}/{{$parameter.pieceId}}',
 					},
+					output: { postReceive: [castDateFields] },
 				},
 			},
 		],

@@ -5,7 +5,7 @@ import type {
 	INodeExecutionData,
 	INodeProperties,
 } from 'n8n-workflow';
-import { appendQs, listOutput, listProperties } from '../shared/listParams';
+import { appendQs, castDateFields, listOutput, listProperties } from '../shared/listParams';
 import { fetchTribunaux } from '../shared/tribunaux';
 
 /** Selectable association states for the `etats` filter. */
@@ -161,7 +161,7 @@ export const associationDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '=/association/{{$parameter.associationNumber}}',
 					},
-					output: { postReceive: [extractVersionHistory] },
+					output: { postReceive: [extractVersionHistory, castDateFields] },
 				},
 			},
 		],

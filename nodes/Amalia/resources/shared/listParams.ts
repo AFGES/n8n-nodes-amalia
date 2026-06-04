@@ -2,8 +2,37 @@ import type {
 	IDataObject,
 	IExecuteSingleFunctions,
 	IHttpRequestOptions,
+	INodeExecutionData,
 	INodeProperties,
 } from 'n8n-workflow';
+
+function castDatesInObject(obj: IDataObject): IDataObject {
+	const result: IDataObject = {};
+	for (const [key, value] of Object.entries(obj)) {
+		if (key.startsWith('date') && typeof value === 'string' && value) {
+			result[key] = new Date(value) as unknown as IDataObject[string];
+		} else if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+			result[key] = castDatesInObject(value as IDataObject) as IDataObject[string];
+		} else if (Array.isArray(value)) {
+			result[key] = (value as unknown[]).map((v) =>
+				v !== null && typeof v === 'object' ? castDatesInObject(v as IDataObject) : v,
+			) as IDataObject[string];
+		} else {
+			result[key] = value;
+		}
+	}
+	return result;
+}
+
+export async function castDateFields(
+	this: IExecuteSingleFunctions,
+	items: INodeExecutionData[],
+): Promise<INodeExecutionData[]> {
+	return items.map((item) => ({
+		json: castDatesInObject((item.json ?? {}) as IDataObject),
+		pairedItem: item.pairedItem,
+	}));
+}
 
 /**
  * Appends a query-string parameter, promoting to an array when the key already
@@ -170,6 +199,7 @@ export const listOutput = {
 				type: 'rootProperty' as const,
 				properties: { property: 'items' },
 			},
+			castDateFields,
 		],
 	},
 };

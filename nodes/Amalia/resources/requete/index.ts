@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { listOutput, listProperties } from '../shared/listParams';
+import { castDateFields, listOutput, listProperties } from '../shared/listParams';
 
 const showOnlyForRequetes = {
 	resource: ['requete'],
@@ -33,6 +33,7 @@ export const requeteDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '=/requete/{{$parameter.requeteNumber}}',
 					},
+					output: { postReceive: [castDateFields] },
 				},
 			},
 			{
@@ -45,6 +46,7 @@ export const requeteDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '=/depot/{{$parameter.depotId}}',
 					},
+					output: { postReceive: [castDateFields] },
 				},
 			},
 		],
