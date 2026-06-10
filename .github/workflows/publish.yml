@@ -11,9 +11,11 @@
 # provenance flag passed by `npm run release` in CI, and the publish step will
 # fail. Check the version installed in this project with:
 #
-#   pnpm list @n8n/node-cli
+#   npm list @n8n/node-cli
 #
-# To upgrade, add @n8n/node-cli@latest as a dev dependency using your package manager.
+# To upgrade:
+#
+#   npm install --save-dev @n8n/node-cli@latest
 #
 # ─── ONE-TIME SETUP ────────────────────────────────────────────────────────────
 #
@@ -47,7 +49,7 @@
 #
 # Run the following command locally to start an interactive release:
 #
-#   pnpm run release
+#   npm run release
 #
 # This will lint, build, prompt for a version bump, update the changelog,
 # commit, tag, and push — which triggers this workflow to publish to npm.
@@ -73,16 +75,16 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v6
-        name: Install pnpm
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          version: 10
-          cache: true
+          node-version: 'lts/*'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: 'pnpm install'
+        run: npm ci
 
       - name: Release
         # Publishes to npm with a provenance attestation (requires id-token: write above).
@@ -94,6 +96,6 @@ jobs:
         #   .npmrc here before publishing.
         run: |
           [ -n "$NPM_TOKEN" ] && npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
-          pnpm run release
+          npm run release
         env:
-          NPM_TOKEN: $
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

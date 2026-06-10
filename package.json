@@ -17,6 +17,7 @@
 	},
 	"scripts": {
 		"build": "n8n-node build",
+		"postbuild": "node -e \"const{cpSync}=require('fs');try{cpSync('nodes/Amalia/translations','dist/nodes/Amalia/translations',{recursive:true})}catch(e){if(e.code!=='ENOENT')throw e}\"",
 		"build:watch": "tsc --watch",
 		"dev": "n8n-node dev",
 		"lint": "n8n-node lint",
@@ -38,11 +39,11 @@
 		]
 	},
 	"devDependencies": {
-		"@n8n/node-cli": "*",
+		"@n8n/node-cli": "^0.34.0",
 		"eslint": "9.32.0",
-		"prettier": "3.6.2",
-		"release-it": "^19.0.4",
-		"typescript": "5.9.2"
+		"prettier": "3.8.4",
+		"release-it": "^20.2.0",
+		"typescript": "6.0.3"
 	},
 	"peerDependencies": {
 		"n8n-workflow": "*"

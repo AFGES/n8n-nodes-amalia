@@ -8,7 +8,7 @@ on:
 
 # Cancel in-progress runs for the same branch/PR to avoid wasting CI minutes.
 concurrency:
-  group: ci-$
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -16,19 +16,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v6
-        name: Install pnpm
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          version: 10
-          cache: true
+          node-version: 'lts/*'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: 'pnpm install'
+        run: npm ci
 
       - name: Run lint
-        run: 'pnpm run lint'
+        run: npm run lint
 
       - name: Run build
-        run: 'pnpm run build'
+        run: npm run build
