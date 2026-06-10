@@ -1,6 +1,6 @@
 {
 	"name": "@afges/n8n-nodes-amalia",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"description": "Node for utilizing data from the AMALIA registry.",
 	"license": "MIT",
 	"homepage": "",
