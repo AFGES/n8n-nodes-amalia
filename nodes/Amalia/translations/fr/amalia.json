@@ -1,0 +1,124 @@
+{
+	"nodeView": {
+		"resource": {
+			"displayName": "Ressource",
+			"options": {
+				"association": { "displayName": "Association" },
+				"piece": { "displayName": "Pièce" },
+				"requete": { "displayName": "Requête" }
+			}
+		},
+		"operation": {
+			"displayName": "Opération",
+			"options": {
+				"getAll": {
+					"displayName": "Obtenir plusieurs",
+					"description": "Lister les résultats"
+				},
+				"get": {
+					"displayName": "Obtenir",
+					"description": "Obtenir un élément par son numéro ou son identifiant"
+				},
+				"getDepot": {
+					"displayName": "Obtenir le dépôt",
+					"description": "Obtenir un dépôt temporaire par son identifiant"
+				}
+			}
+		},
+		"associationNumber": {
+			"displayName": "Numéro d'association",
+			"description": "Le numéro de l'association à récupérer"
+		},
+		"rehydrateVisibles": {
+			"displayName": "Afficher l'historique des versions",
+			"description": "Si activé, conserve l'historique complet des versions (plus récente en premier) dans un champ « version », au lieu de fusionner uniquement la version la plus récente dans l'enregistrement"
+		},
+		"filters": {
+			"displayName": "Filtres",
+			"placeholder": "Ajouter un filtre",
+			"description": "Critères de recherche envoyés à l'API AMALIA",
+			"options": {
+				"condition": {
+					"displayName": "Condition",
+					"values": {
+						"field": {
+							"displayName": "Champ",
+							"description": "Champ de l'association à filtrer",
+							"options": {
+								"adresse": { "displayName": "Adresse" },
+								"commune": { "displayName": "Commune" },
+								"folio": { "displayName": "Folio" },
+								"mes": { "displayName": "Les miens uniquement" },
+								"nom": { "displayName": "Nom" },
+								"numero": { "displayName": "Numéro" },
+								"codePostal": { "displayName": "Code postal" },
+								"etats": { "displayName": "États" },
+								"tribunal": { "displayName": "Tribunal" },
+								"volume": { "displayName": "Volume" }
+							}
+						},
+						"valueMes": {
+							"displayName": "Les miens uniquement"
+						},
+						"valueEtats": {
+							"displayName": "États",
+							"options": {
+								"INSCRITE": { "displayName": "Inscrite" },
+								"DISSOUTE": { "displayName": "Dissoute" },
+								"RADIEE": { "displayName": "Radiée" },
+								"NONCONFORME": { "displayName": "Non Conforme" }
+							}
+						},
+						"valueTribunal": {
+							"displayName": "Noms ou IDs de tribunal"
+						},
+						"valueString": {
+							"displayName": "Valeur"
+						},
+						"valueNumber": {
+							"displayName": "Valeur"
+						}
+					}
+				},
+				"filter": {
+					"displayName": "Filtre",
+					"values": {
+						"name": {
+							"displayName": "Nom",
+							"description": "Nom du paramètre de requête"
+						},
+						"value": {
+							"displayName": "Valeur",
+							"description": "Valeur du paramètre de requête"
+						}
+					}
+				}
+			}
+		},
+		"returnAll": {
+			"displayName": "Tout retourner",
+			"description": "Si tous les résultats ou uniquement jusqu'à une limite donnée doivent être retournés"
+		},
+		"limit": {
+			"displayName": "Limite",
+			"description": "Nombre maximum de résultats à retourner"
+		},
+		"sort": {
+			"displayName": "Tri",
+			"placeholder": "numero,ASC",
+			"description": "Expression de tri au format SpringData, ex. <code>numero,ASC</code>"
+		},
+		"requeteNumber": {
+			"displayName": "Numéro de requête",
+			"description": "Le numéro de la requête associée"
+		},
+		"depotId": {
+			"displayName": "ID du dépôt",
+			"description": "L'identifiant du dépôt à récupérer"
+		},
+		"pieceId": {
+			"displayName": "ID de la pièce",
+			"description": "L'identifiant de la pièce à récupérer"
+		}
+	}
+}
