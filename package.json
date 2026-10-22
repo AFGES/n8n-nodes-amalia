@@ -13,7 +13,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/afges/n8n-nodes-amalia.git"
+		"url": "git+https://github.com/AFGES/n8n-nodes-amalia.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
