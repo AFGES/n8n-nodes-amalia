@@ -63,25 +63,42 @@ on:
       # See "TAG CONVENTION" above if you prefer tags with a "v" prefix.
       - '*.*.*'
 
+# Never cancel a release in progress; queue newer tags instead.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+# No token permissions by default; the job opts in to what it needs.
+permissions: {}
+
 jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     permissions:
       # Required to mint an OIDC token for npm provenance attestation.
-      id-token: write
+      id-token: write # mint OIDC token for npm provenance
       # Scoped down from the default (write) for least-privilege publishing.
       contents: read
 
     steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 'lts/*'
-          cache: 'npm'
+          # No dependency cache: release artifacts must not depend on a poisonable cache.
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci
