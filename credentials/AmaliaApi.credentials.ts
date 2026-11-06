@@ -56,7 +56,10 @@ export class AmaliaApi implements ICredentialType {
 
 	genericAuth = true;
 
-	icon: Icon = 'file:../nodes/Amalia/amalia.svg';
+	icon: Icon = {
+		light: 'file:../nodes/Amalia/amalia.svg',
+		dark: 'file:../nodes/Amalia/amalia.dark.svg',
+	};
 
 	properties: INodeProperties[] = [
 		{

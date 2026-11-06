@@ -14,7 +14,7 @@ export class Amalia implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'AMALIA',
 		name: 'amalia',
-		icon: 'file:amalia.svg',
+		icon: { light: 'file:amalia.svg', dark: 'file:amalia.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
