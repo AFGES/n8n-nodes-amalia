@@ -1,0 +1,39 @@
+# CI on git.afges.eu (forgejo-runner VM). Publishing never runs here: the push mirror copies tags to GitHub,
+# where .github/workflows/publish.yml publishes to npm with provenance. This directory also stops Forgejo from
+# running .github/workflows.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vite+ check (format, Oxlint, typecheck)
+        run: npm run check
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run build
+        run: npm run build

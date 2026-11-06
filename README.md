@@ -95,7 +95,7 @@ ne sont pas pris en charge.
 
 - [Documentation des nœuds communautaires n8n](https://docs.n8n.io/integrations/community-nodes/)
 - [Registre AMALIA](https://associations.alsace-moselle.fr)
-- [Dépôt GitHub](https://github.com/AFGES/n8n-nodes-amalia)
+- [Dépôt](https://git.afges.eu/n8n/n8n-nodes-amalia) (miroir [GitHub](https://github.com/AFGES/n8n-nodes-amalia))
 
 ### Historique des versions
 
@@ -191,7 +191,7 @@ Creating or modifying associations and requests, and uploading documents, is not
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 - [AMALIA registry](https://associations.alsace-moselle.fr)
-- [GitHub repository](https://github.com/AFGES/n8n-nodes-amalia)
+- [Repository](https://git.afges.eu/n8n/n8n-nodes-amalia) ([GitHub](https://github.com/AFGES/n8n-nodes-amalia) mirror)
 
 ### Version history
 

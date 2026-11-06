@@ -3,7 +3,10 @@
 	"version": "0.4.0",
 	"description": "Node for utilizing data from the AMALIA registry.",
 	"license": "MIT",
-	"homepage": "https://github.com/AFGES/n8n-nodes-amalia#readme",
+	"homepage": "https://git.afges.eu/n8n/n8n-nodes-amalia#readme",
+	"bugs": {
+		"url": "https://git.afges.eu/n8n/n8n-nodes-amalia/issues"
+	},
 	"keywords": [
 		"n8n-community-node-package"
 	],
@@ -25,7 +28,7 @@
 		"check": "vp check",
 		"check:fix": "vp check --fix",
 		"format": "vp fmt",
-		"release": "n8n-node release",
+		"release": "release-it",
 		"prepublishOnly": "n8n-node prerelease"
 	},
 	"files": [

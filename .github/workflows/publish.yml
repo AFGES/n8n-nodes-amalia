@@ -8,7 +8,7 @@
 # ─── PREREQUISITES ─────────────────────────────────────────────────────────────
 #
 # @n8n/node-cli ≥ 0.23.0 is required. Earlier versions do not support the
-# provenance flag passed by `npm run release` in CI, and the publish step will
+# provenance flag passed by `n8n-node release` in CI, and the publish step will
 # fail. Check the version installed in this project with:
 #
 #   npm list @n8n/node-cli
@@ -39,12 +39,15 @@
 #
 # ─── RELEASE PROCESS ───────────────────────────────────────────────────────────
 #
-# Run the following command locally to start an interactive release:
+# The source of truth is https://git.afges.eu/n8n/<repo>; GitHub is its push
+# mirror. Run the following command locally to start an interactive release:
 #
 #   npm run release
 #
-# This will lint, build, prompt for a version bump, update the changelog,
-# commit, tag, and push — which triggers this workflow to publish to npm.
+# release-it (.release-it.json) lints, builds, prompts for a version bump,
+# updates the changelog, commits, tags and pushes to Forgejo. The push mirror
+# copies the tag here, which triggers this workflow: publish to npm, then
+# create the GitHub release.
 
 name: Publish
 
@@ -99,4 +102,27 @@ jobs:
         # Publishes to npm with a provenance attestation, authenticated through
         # OIDC trusted publishing (requires id-token: write above).
         # Lint and build run automatically as part of the release process.
-        run: npm run release
+        # n8n-node release, not `npm run release` (local release-it, no publish).
+        run: npx n8n-node release
+
+  github-release:
+    name: Create GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write # create the release
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Create release
+        run: gh release create "$TAG" --repo "$REPO" --verify-tag --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
