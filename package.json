@@ -3,7 +3,7 @@
 	"version": "0.3.4",
 	"description": "Node for utilizing data from the AMALIA registry.",
 	"license": "MIT",
-	"homepage": "",
+	"homepage": "https://github.com/AFGES/n8n-nodes-amalia#readme",
 	"keywords": [
 		"n8n-community-node-package"
 	],
@@ -22,6 +22,9 @@
 		"dev": "n8n-node dev",
 		"lint": "n8n-node lint",
 		"lint:fix": "n8n-node lint --fix",
+		"check": "vp check",
+		"check:fix": "vp check --fix",
+		"format": "vp fmt",
 		"release": "n8n-node release",
 		"prepublishOnly": "n8n-node prerelease"
 	},
@@ -39,11 +42,10 @@
 		]
 	},
 	"devDependencies": {
-		"@n8n/node-cli": "^0.34.0",
-		"eslint": "9.29.0",
-		"prettier": "3.8.4",
-		"release-it": "^20.2.0",
-		"typescript": "6.0.3"
+		"@n8n/node-cli": "^0.54.3",
+		"release-it": "^21.1.2",
+		"typescript": "6.0.3",
+		"vite-plus": "1.4.0"
 	},
 	"peerDependencies": {
 		"n8n-workflow": "*"
