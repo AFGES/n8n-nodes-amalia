@@ -11,7 +11,7 @@ export async function fetchTribunaux(
 	this: IExecuteSingleFunctions | ILoadOptionsFunctions,
 ): Promise<Array<{ id: number; libelle: string }>> {
 	const credentials = await this.getCredentials('amaliaApi');
-	const baseUrl = String(credentials.baseUrl).replace(/\/+$/, '');
+	const baseUrl = (credentials.baseUrl as string).replace(/\/+$/, '');
 	const constantes = (await this.helpers.httpRequestWithAuthentication.call(this, 'amaliaApi', {
 		method: 'GET',
 		url: `${baseUrl}/api/constantes`,
