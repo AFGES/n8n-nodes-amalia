@@ -122,7 +122,9 @@ async function extractVersionHistory(
 
 		// default: merge the newest non-null `association` into the root,
 		// drop the history array and the other per-version fields (evenement/requete/extrait)
-		const latest = versions.find((v) => !!(v as IDataObject).association) as IDataObject | undefined;
+		const latest = versions.find((v) => !!(v as IDataObject).association) as
+			| IDataObject
+			| undefined;
 		return {
 			json: { ...rest, association: latest?.association ?? null },
 			pairedItem: item.pairedItem,

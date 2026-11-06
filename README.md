@@ -22,14 +22,14 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 All operations are read-only.
 
-| Resource    | Operation  | Description                                      |
-| ----------- | ---------- | ------------------------------------------------ |
-| Association | Get Many   | List and search associations                     |
-| Association | Get        | Get one association by its number                |
-| Request     | Get Many   | List requests                                    |
-| Request     | Get        | Get one request by its number                    |
-| Request     | Get Depot  | Get a temporary deposit (depot) by its ID        |
-| Piece       | Get        | Get one document piece of a request              |
+| Resource    | Operation | Description                               |
+| ----------- | --------- | ----------------------------------------- |
+| Association | Get Many  | List and search associations              |
+| Association | Get       | Get one association by its number         |
+| Request     | Get Many  | List requests                             |
+| Request     | Get       | Get one request by its number             |
+| Request     | Get Depot | Get a temporary deposit (depot) by its ID |
+| Piece       | Get       | Get one document piece of a request       |
 
 Creating or modifying associations and requests, and uploading documents, is not supported.
 
@@ -68,8 +68,8 @@ Any field whose name starts with `date` is returned as a date object.
 
 ## Resources
 
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* [AMALIA registry](https://associations.alsace-moselle.fr)
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [AMALIA registry](https://associations.alsace-moselle.fr)
 
 ## Version history
 

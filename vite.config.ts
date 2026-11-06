@@ -158,6 +158,12 @@ export default defineConfig({
 		endOfLine: 'lf',
 		printWidth: 100,
 		sortPackageJson: false,
-		ignorePatterns: ['dist/**', 'association-externe-front/**', '.agents/**', 'AGENTS.md', '.claude/**'],
+		ignorePatterns: [
+			'dist/**',
+			'association-externe-front/**',
+			'.agents/**',
+			'AGENTS.md',
+			'.claude/**',
+		],
 	},
 });
