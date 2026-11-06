@@ -8,5 +8,12 @@
 	"vulnerabilityAlerts": {
 		"enabled": true,
 		"labels": ["security"]
-	}
+	},
+	"packageRules": [
+		{
+			"description": "TypeScript 7 breaks n8n-node lint (typescript-eslint); hold until @n8n/node-cli supports it",
+			"matchPackageNames": ["typescript"],
+			"allowedVersions": "<7"
+		}
+	]
 }
